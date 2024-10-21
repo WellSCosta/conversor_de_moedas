@@ -1,3 +1,6 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -6,6 +9,10 @@ import java.net.http.HttpResponse;
 import java.util.Scanner;
 
 public class Menu {
+    Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .create();
+
     Scanner sc = new Scanner(System.in);
     String endereco;
 
@@ -19,13 +26,13 @@ public class Menu {
     }
 
     private void mensagemBemVindo() {
-        System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" +
+        System.out.println("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" +
                 "\nBem-vindo(a) ao Conversor de Moedas!" +
                 "\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
     }
 
     private void mensagemOpcoes() {
-        System.out.println("1) Dólar -> Peso Argentino" +
+        System.out.print("1) Dólar -> Peso Argentino" +
                 "\n2) Peso Argentino -> Dólar" +
                 "\n3) Dólar -> Real Brasileiro" +
                 "\n4) Real Brasileiro -> Dólar" +
@@ -40,23 +47,48 @@ public class Menu {
         int opcao = sc.nextInt();
 
         while (opcao < 1 || opcao > 7) {
-            System.out.println("Opcão Inválida, Tente Novamente: ");
+            System.out.print("Opcão Inválida, Tente Novamente: ");
             opcao = sc.nextInt();
         }
+        if (opcao == 7) {
+            System.exit(0);
+        }
+
+        System.out.print("Valor para converter: ");
+        Double valor = sc.nextDouble();
+
         switch (opcao) {
-            case 1:  converter("USD", "ARS");
-            case 2:  converter("ARS", "USD");
-            case 3:  converter("USD", "BRL");
-            case 4:  converter("BRL", "USD");
-            case 5:  converter("USD", "ars");
-            case 6:  converter("usd", "USD");
-            case 7:  System.exit(0);
-            default: break;
+            case 1:  converter("USD", "ARS", valor);
+                break;
+            case 2:  converter("ARS", "USD", valor);
+                break;
+            case 3:  converter("USD", "BRL", valor);
+                break;
+            case 4:  converter("BRL", "USD", valor);
+                break;
+            case 5:  converter("USD", "COP", valor);
+                break;
+            case 6:  converter("COP", "USD", valor);
         }
     }
 
-    private void converter(String moeda1, String moeda2) {
-        String endereco = this.endereco + moeda1;
+    private void converter(String moeda1, String moeda2, Double valor) {
+        Conversor conversor = buscarAPI(moeda1);
+        Double valorConvertido = conversor.converter(moeda2, valor);
+
+        System.out.println("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+        System.out.printf("Valor %.2f [%s] \nCorresponde ao valor %.2f [%s]\n",valor, moeda1 ,valorConvertido, moeda2);
+        System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+
+        System.out.println("Deseja fazer outra conversão? [s/n]");
+        String opcao = sc.next();
+        if (opcao.equalsIgnoreCase("s")) {
+            opcao();
+        }
+    }
+
+    private Conversor buscarAPI(String moedaBase) {
+        String endereco = this.endereco + moedaBase;
 
         try {
             HttpClient client = HttpClient.newHttpClient();
@@ -70,8 +102,10 @@ public class Menu {
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
             String json = response.body();
-            System.out.println(json);
-            
+
+            ValoresConversao vc = gson.fromJson(json, ValoresConversao.class);
+            return new Conversor(vc.conversion_rates());
+
         } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
