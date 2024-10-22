@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Menu {
@@ -26,36 +27,52 @@ public class Menu {
     }
 
     private void mensagemBemVindo() {
-        System.out.println("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" +
-                "\nBem-vindo(a) ao Conversor de Moedas!" +
-                "\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+        System.out.println("""
+                =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+                Bem-vindo(a) ao Conversor de Moedas!
+                =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=""");
     }
 
     private void mensagemOpcoes() {
-        System.out.print("1) Dólar -> Peso Argentino" +
-                "\n2) Peso Argentino -> Dólar" +
-                "\n3) Dólar -> Real Brasileiro" +
-                "\n4) Real Brasileiro -> Dólar" +
-                "\n5) Dólar -> Peso Colombiano" +
-                "\n6) Peso Colombiano -> Dólar" +
-                "\n7) Sair" +
-                "\nEscolha uma opcão válida: ");
+        System.out.print("""
+                1) Dólar -> Peso Argentino
+                2) Peso Argentino -> Dólar
+                3) Dólar -> Real Brasileiro
+                4) Real Brasileiro -> Dólar
+                5) Dólar -> Peso Colombiano
+                6) Peso Colombiano -> Dólar
+                7) Sair
+                Escolha uma opcão válida:\s""");
     }
 
     public void opcao() {
         mensagemOpcoes();
-        int opcao = sc.nextInt();
+        int opcao = 0;
+        double valor = 0.0;
+        boolean entradaValida = false;
 
-        while (opcao < 1 || opcao > 7) {
-            System.out.print("Opcão Inválida, Tente Novamente: ");
-            opcao = sc.nextInt();
-        }
-        if (opcao == 7) {
-            System.exit(0);
-        }
+        while (!entradaValida) {
+            try {
+                opcao = sc.nextInt();
+                sc.nextLine();
 
-        System.out.print("Valor para converter: ");
-        Double valor = sc.nextDouble();
+                while (opcao < 1 || opcao > 7) {
+                    System.out.print("Opcão Inválida, Tente Novamente: ");
+                    opcao = sc.nextInt();
+                }
+                if (opcao == 7) {
+                    System.exit(0);
+                }
+
+                System.out.print("Valor para converter: ");
+                valor = sc.nextDouble();
+
+                entradaValida = true;
+            } catch (InputMismatchException e) {
+                System.out.print("VALOR INVÁLIDO, tente novamente: ");
+                sc.next();
+            }
+        }
 
         switch (opcao) {
             case 1:  converter("USD", "ARS", valor);
@@ -80,8 +97,12 @@ public class Menu {
         System.out.printf("Valor %.2f [%s] \nCorresponde ao valor %.2f [%s]\n",valor, moeda1 ,valorConvertido, moeda2);
         System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
-        System.out.println("Deseja fazer outra conversão? [s/n]");
-        String opcao = sc.next();
+        String opcao;
+        do {
+            System.out.println("Deseja fazer outra conversão? [s/n]");
+            opcao = sc.next();
+        } while(!opcao.equalsIgnoreCase("s") && !opcao.equalsIgnoreCase("n"));
+
         if (opcao.equalsIgnoreCase("s")) {
             opcao();
         }
@@ -96,7 +117,7 @@ public class Menu {
                     .uri(URI.create(endereco))
                     .build();
 
-            HttpResponse<String> response = null;
+            HttpResponse<String> response;
 
             response = client
                     .send(request, HttpResponse.BodyHandlers.ofString());
