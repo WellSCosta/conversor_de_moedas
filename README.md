@@ -9,11 +9,11 @@ Resultado do segundo desafio do programa ONE, da Oracle em parceria com a Alura:
 - Utilizando uma API para obter taxas de conversão dinâmicas, o aplicativo oferece uma experiência atualizada e precisa.
 
 <p align="center" >
-     <img width="400" heigth="400" src="/img/conversor_iniciado.png">
+     <img width="400" heigth="400" src="https://github.com/user-attachments/assets/d6fa897a-c9a3-4065-ac1e-2af17ac08703">
 </p>
 
 <p align="center" >
-     <img width="400" heigth="400" src="/img/conversor_finalizado.png">
+     <img width="400" heigth="400" src="https://github.com/user-attachments/assets/b9254e4a-0530-4a9f-8e2f-3d57e017b9fd">
 </p>
 
 Funcionalidade:
