@@ -40,3 +40,9 @@ Para dúvidas ou sugestões, entre em contato através do e-mail: wellscostaofc@
 LinkedIn
 ---
 https://www.linkedin.com/in/wellington-santos-backend-java/
+
+Badge do Desafio
+---
+<p align="left" >
+     <img width="200" heigth="200" src="https://github.com/user-attachments/assets/dd585cb9-29fb-451d-aadd-b46972c9f4d8">
+</p>
